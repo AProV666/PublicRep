@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/booklib
+    username: root
+    password: testtest
+    serverTimezone: Europe/Moscow
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+someParameter:
+  value: 5463
+
