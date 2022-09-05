@@ -22,7 +22,7 @@ public class ParserTickerMoex {
         this.boardId = boardId;
     }
 
-    public ArrayList<TickerPojo> tParser(String webSiteURLTicker, String ticker, ToDB toDB) {
+    public ArrayList<TickerPojo> tParser(String webSiteURLTicker, String ticker) {
 
         try {
             HttpClientUtils httpClientUtils = new HttpClientUtils();
@@ -30,7 +30,7 @@ public class ParserTickerMoex {
             ObjectMapper om = new ObjectMapper();
             Root root = om.readValue(json, Root.class);
 
-            tickerList = getInfoFromTicker(root, ticker, toDB);
+            tickerList = getInfoFromTicker(root, ticker);
 
             total = root.getHistoryCursor().getData().get(0).get(1);
             pageSize = root.getHistoryCursor().getData().get(0).get(2);
@@ -55,7 +55,7 @@ public class ParserTickerMoex {
     }
 
 
-    public ArrayList<TickerPojo> getInfoFromTicker(Root root, String ticker, ToDB toDB) {
+    public ArrayList<TickerPojo> getInfoFromTicker(Root root, String ticker) {
 
         ArrayList<String> columnsList = root.getHistory().getColumns();
         int numTradeDate = 0;
@@ -82,14 +82,13 @@ public class ParserTickerMoex {
         }
 
 
-
         ArrayList<TickerPojo> tickerPojoList = new ArrayList<>();
 
         for (int i = 0; i < root.getHistory().getData().size(); i++) {
             String boardEq = String.valueOf(root.getHistory().getData().get(i).get(0));
 
             if (boardEq.equals(boardId)) {
-                if(root.getHistory().getData().get(i).get(numLow) == null ||
+                if (root.getHistory().getData().get(i).get(numLow) == null ||
                         root.getHistory().getData().get(i).get(numHigh) == null ||
                         root.getHistory().getData().get(i).get(numClose) == null) {
                     continue;
@@ -110,24 +109,8 @@ public class ParserTickerMoex {
                 Integer volume = Integer.valueOf(String.valueOf(root.getHistory().getData().get(i).get(numVolume)));
 
 
-
                 TickerPojo tickerPojo = new TickerPojo(date, low, high, close, volume);
                 tickerPojoList.add(tickerPojo);
-
-
-
-                TickerPojoForDB tickerPojoForDB = new TickerPojoForDB();
-                tickerPojoForDB.setTicker(ticker);
-                tickerPojoForDB.setDate(dateSt);
-                tickerPojoForDB.setLow(low);
-                tickerPojoForDB.setHigh(high);
-                tickerPojoForDB.setClose(close);
-                tickerPojoForDB.setVolume(volume);
-
-                toDB.addToDB(tickerPojoForDB);
-
-
-
             }
         }
         return tickerPojoList;
